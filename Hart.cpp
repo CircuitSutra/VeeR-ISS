@@ -5231,10 +5231,14 @@ bool
 Hart<URV>::simpleRunWithLimit()
 {
   uint64_t limit = instCountLim_;
+  std::string instStr{};
   while (noUserStop and instCounter_ < limit) 
     {
       currPc_ = pc_;
       ++instCounter_;
+
+      if (processExternalInterrupt(nullptr, instStr))
+        continue; // Next instruction in trap handler.
 
       // Fetch/decode unless match in decode cache.
       uint32_t ix = (pc_ >> 1) & decodeCacheMask_;
@@ -5263,10 +5267,14 @@ template <typename URV>
 bool
 Hart<URV>::simpleRunNoLimit()
 {
+  std::string instStr{};
   while (noUserStop) 
     {
       currPc_ = pc_;
       ++instCounter_;
+
+      if (processExternalInterrupt(nullptr, instStr))
+        continue; // Next instruction in trap handler.
 
       // Fetch/decode unless match in decode cache.
       uint32_t ix = (pc_ >> 1) & decodeCacheMask_;
